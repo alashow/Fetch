@@ -2,6 +2,7 @@ package com.tonyodev.fetch2.fetch
 
 import android.os.Handler
 import android.os.Looper
+import androidx.core.net.toUri
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2.database.DownloadInfo
 import com.tonyodev.fetch2.database.FetchDatabaseManagerWrapper
@@ -11,6 +12,7 @@ import com.tonyodev.fetch2.helper.PriorityListProcessor
 import com.tonyodev.fetch2.provider.GroupInfoProvider
 import com.tonyodev.fetch2.util.*
 import com.tonyodev.fetch2core.*
+import java.io.File
 import java.io.IOException
 import java.util.*
 
@@ -448,18 +450,20 @@ class FetchHandlerImpl(private val namespace: String,
         if (downloadWithFile != null) {
             throw FetchException(REQUEST_WITH_FILE_PATH_ALREADY_EXIST)
         }
-        val copy = download.toDownloadInfo(fetchDatabaseManagerWrapper.getNewDownloadInfoInstance())
-        copy.id = getUniqueId(download.url, newFileName)
-        copy.file = newFileName
-        val pair = fetchDatabaseManagerWrapper.insert(copy)
-        if (!pair.second) {
-            throw FetchException(FILE_CANNOT_BE_RENAMED)
-        }
-        val renamed = storageResolver.renameFile(download.file, newFileName)
-        return if (!renamed) {
-            fetchDatabaseManagerWrapper.delete(copy)
+        val renamedFilePath = storageResolver.renameFile(download.file, newFileName)
+
+        return if (renamedFilePath.isNullOrEmpty()) {
             throw FetchException(FILE_CANNOT_BE_RENAMED)
         } else {
+            val copy = download.toDownloadInfo(fetchDatabaseManagerWrapper.getNewDownloadInfoInstance())
+            copy.id = getUniqueId(download.url, newFileName)
+            copy.file = renamedFilePath
+
+            val pair = fetchDatabaseManagerWrapper.insert(copy)
+            if (!pair.second) {
+                throw FetchException(FILE_CANNOT_BE_RENAMED)
+            }
+
             fetchDatabaseManagerWrapper.delete(download)
             pair.first
         }

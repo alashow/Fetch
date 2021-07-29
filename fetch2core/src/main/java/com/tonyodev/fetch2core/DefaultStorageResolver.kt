@@ -40,11 +40,11 @@ open class DefaultStorageResolver(
         }
     }
 
-    override fun renameFile(oldFile: String, newFile: String): Boolean {
-        if (oldFile.isEmpty() || newFile.isEmpty()) {
-            return false
+    override fun renameFile(oldFile: String, newFileName: String): String? {
+        if (oldFile.isEmpty() || newFileName.isEmpty()) {
+            return null
         }
-        return renameFile(oldFile, newFile, context)
+        return renameFile(oldFile, newFileName, context)
     }
 
     override fun preAllocateFile(file: String, contentLength: Long): Boolean {

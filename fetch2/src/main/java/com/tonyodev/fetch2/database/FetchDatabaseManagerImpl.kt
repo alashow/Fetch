@@ -114,7 +114,7 @@ class FetchDatabaseManagerImpl constructor(context: Context,
         throwExceptionIfClosed()
         database.beginTransaction()
         database.execSQL("UPDATE ${DownloadDatabase.TABLE_NAME} SET "
-                + "${DownloadDatabase.COLUMN_EXTRAS} = '?' "
+                + "${DownloadDatabase.COLUMN_EXTRAS} = ? "
                 + "WHERE ${DownloadDatabase.COLUMN_ID} = ?",
                 arrayOf(extras.toJSONString(), id)
         )

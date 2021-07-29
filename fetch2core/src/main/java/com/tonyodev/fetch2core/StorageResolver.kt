@@ -70,8 +70,8 @@ interface StorageResolver {
     /**
      * This method is used to rename an existing file.
      * @param oldFile the old file
-     * @param newFile the new file
+     * @param newFileName the new name of the file
      * */
-    fun renameFile(oldFile: String, newFile: String): Boolean
+    fun renameFile(oldFile: String, newFileName: String): String?
 
 }
